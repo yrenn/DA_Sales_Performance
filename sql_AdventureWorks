@@ -1,0 +1,397 @@
+# Easy question
+1)
+select FirstName, EmailAddress
+from Customer
+where CompanyName = 'Bike World';
+
+result:
+FirstName	EmailAddress
+Kerim	kerim0@adventure-works.com
+
+2)
+select CompanyName
+from Customer
+join CustomerAddress on Customer.CustomerID = CustomerAddress.CustomerID
+join Address on CustomerAddress.AddressID= Address.AddressID
+where city = 'Dallas';
+
+result:
+CompanyName
+Town Industries
+Elite Bikes
+Elite Bikes
+Third Bike Store
+Unsurpassed Bikes
+Rental Bikes
+
+3)
+select count(SalesOrderDetail.ProductID) as numItem
+from SalesOrderDetail
+ join Product on SalesOrderDetail.ProductID = Product.ProductID 
+where ListPrice > 1000;
+
+result:
+numItem
+131
+
+4)
+select CompanyName
+from Customer
+ join SalesOrderHeader on Customer.CustomerID = SalesOrderHeader.CustomerID
+ where (SalesOrderHeader.subtotal + TaxAmt + Freight) > 100000;
+ 
+ result:
+CompanyName
+Action Bicycle Specialists
+Metropolitan Bicycle Supply
+
+5)
+select sum(SalesOrderDetail.OrderQty) as numRacingSockL
+from SalesOrderDetail
+ join Product on SalesOrderDetail.ProductID = Product.ProductID
+ join SalesOrderHeader on SalesOrderDetail.SalesOrderID = SalesOrderHeader.SalesOrderID
+ join Customer on SalesOrderHeader.CustomerID = Customer.CustomerID
+where Product.Name = 'Racing Socks, L' and CompanyName = 'Riding Cycles';
+
+ result:
+ numRacingSockL
+ 3
+
+# medium questions
+6)
+select SalesOrderID, UnitPrice
+from SalesOrderDetail
+where OrderQty = 1;
+
+ result:
+SalesOrderID	UnitPrice
+71774	356.9
+71774	356.9
+71776	63.9
+71780	323.99
+...
+
+7)
+select Product.Name, Customer.CompanyName
+from ProductModel
+  join Product on ProductModel.ProductModelID = Product.ProductModelID
+  join SalesOrderDetail on Product.ProductID = SalesOrderDetail.ProductID
+  join SalesOrderHeader on SalesOrderDetail.SalesOrderID = SalesOrderHeader.SalesOrderID
+  join Customer on SalesOrderHeader.CustomerID = Customer.CustomerID
+
+where ProductModel.Name = 'Racing Socks';
+
+result:
+Name	CompanyName
+Racing Socks, M	Thrifty Parts and Sales
+Racing Socks, M	Sports Products Store
+Racing Socks, M	The Bicycle Accessories Company
+Racing Socks, M	Remarkable Bike Store
+Racing Socks, L	Eastside Department Store
+Racing Socks, L	Riding Cycles
+Racing Socks, L	Sports Products Store
+Racing Socks, L	Essential Bike Works
+Racing Socks, L	The Bicycle Accessories Company
+Racing Socks, L	Remarkable Bike Store
+
+8)
+select ProductDescription.Description
+from ProductDescription
+
+ join ProductModelProductDescription on ProductDescription.ProductDescriptionID = ProductModelProductDescription.ProductDescriptionID
+ join ProductModel on ProductModelProductDescription.ProductModelID = ProductModel.ProductModelID
+ join Product on ProductModel.ProductModelID = Product.ProductModelID
+
+ where ProductModelProductDescription.culture = 'fr'
+  and Product.ProductID = '736';
+
+result:
+Description
+Le cadre LL en aluminium offre une conduite confortable, une excellente absorption des bosses pour un très bon rapport qualité-prix
+
+9)
+select Customer.CompanyName, SalesOrderHeader.SubTotal,SUM(SalesOrderDetail.OrderQty * Product.weight) as sumWeight
+from Product
+  join SalesOrderDetail on Product.ProductID = SalesOrderDetail.ProductID
+  join SalesOrderHeader on SalesOrderDetail.SalesOrderID = SalesOrderHeader.SalesOrderID
+  join Customer on SalesOrderHeader.CustomerID = Customer.CustomerID
+  group by SalesOrderHeader.SalesOrderID, SalesOrderHeader.SubTotal, Customer.CompanyName
+  order by SalesOrderHeader.SubTotal DESC;
+  
+  result:
+CompanyName	SubTotal	sumWeight
+Action Bicycle Specialists	108561.83	1133911.56
+Metropolitan Bicycle Supply	98278.69	679588.02
+Bulk Discount Store	88812.86	34813.05
+Eastside Department Store	83858.43	565638.72
+Riding Cycles	78029.69	504095.33
+Many Bikes Store	74058.81	744328.6
+Instruments and Parts Company	63980.99	731576.77
+...
+
+10)
+select sum(SalesOrderDetail.OrderQty) as numProducts
+from SalesOrderDetail
+ join product on SalesOrderDetail.ProductID = product.ProductID
+ join SalesOrderHeader on SalesOrderDetail.SalesOrderID = SalesOrderHeader.SalesOrderID
+ join Customer on SalesOrderHeader.CustomerID = Customer.CustomerID
+ join CustomerAddress on Customer.CustomerID = CustomerAddress.CustomerID
+ join Address on CustomerAddress.AddressID = Address.AddressID
+ join ProductCategory on Product.ProductCategoryID = ProductCategory.ProductCategoryID
+
+where ProductCategory.Name = 'Cranksets'
+      and Address.City = 'London';
+      
+result:
+numProducts
+9
+
+# Hard questions
+
+11)
+select CompanyName,
+  max(case when AddressType = 'Main Office' then AddressLine1 else '' end) as mainOfficeAddress,
+  max(case when AddressType = 'Shipping' then AddressLine1 else '' end) as shippingAddress
+from Address
+ join CustomerAddress on Address.AddressID = CustomerAddress.AddressID
+ join Customer on CustomerAddress.CustomerID = Customer.CustomerID
+where Address.city = 'Dallas'
+group by Customer.CompanyName
+
+Result:
+CompanyName	mainOfficeAdd..	shippingAddre..
+Elite Bikes	Po Box 8259024	9178 Jumping St.
+Rental Bikes	99828 Routh Street, Suite 825	
+Third Bike Store	2500 North Stemmons Freeway	
+Town Industries	P.O. Box 6256916	
+Unsurpassed Bikes	Po Box 8035996	
+
+12)
+select SalesOrderHeader.SalesOrderID, SalesOrderHeader.SubTotal as ST1,
+  sum(SalesOrderDetail.OrderQty * SalesOrderDetail.UnitPrice) as ST2,
+  sum(SalesOrderDetail.OrderQty * Product.ListPrice) as ST3
+from SalesOrderHeader
+  join SalesOrderDetail on SalesOrderHeader.SalesOrderID = SalesOrderDetail.SalesOrderID
+  join Product on SalesOrderDetail.ProductID = Product.ProductID
+group by SalesOrderHeader.SalesOrderID, SalesOrderHeader.SubTotal;
+
+Result:
+SalesOrderID	ST1	ST2	ST3
+71774	880.35	713.8	1189.66
+71776	78.81	63.9	106.5
+71780	38418.69	30600.81	56651.56
+71782	39785.33	33319.68	55533.31
+71783	83858.43	68141.99	121625.43
+71784	108561.83	90341.14	151932.58
+...
+
+13)
+select Product.Name, sum(SalesOrderDetail.OrderQty * SalesOrderDetail.UnitPrice) as Value
+from Product
+ join SalesOrderDetail on Product.ProductID = SalesOrderDetail.ProductID
+group by Product.Name
+order by Value desc;
+
+result:
+Name	Value
+Touring-1000 Blue, 60	37191.44
+Mountain-200 Black, 42	37178.73
+Mountain-200 Black, 38	35801.74
+Road-350-W Yellow, 48	33509.58
+Touring-1000 Yellow, 60	23745.32
+
+14)
+select a.range as RANGE, count(a.Total) as 'Num orders', sum(a.Total) as 'Total Value'
+from ( select
+      case when SalesOrderDetail.UnitPrice * SalesOrderDetail.OrderQty between 0 and 99
+      then '0 - 99'
+      when SalesOrderDetail.UnitPrice * SalesOrderDetail.OrderQty between 100 and 999
+      then '100-999'
+      when SalesOrderDetail.UnitPrice * SalesOrderDetail.OrderQty between 1000 and 9999
+      then '1000-9999'
+      when SalesOrderDetail.UnitPrice * SalesOrderDetail.OrderQty > 10000
+      then '10000-'
+      else ''
+      end as range,
+      SalesOrderDetail.UnitPrice * SalesOrderDetail.OrderQty AS Total
+      from SalesOrderDetail
+      )a
+
+group by a.range
+order by a.range;
+
+Result:
+RANGE	Num orders	Total Value
+0 - 99	129	6576.02
+100-999	225	90859.33
+1000-9999	138	433813.21
+10000-	8	113661.13
+
+15)
+# select 3  city
+select top 3 * from(
+select Address.City, sum(SalesOrderDetail.OrderQty * SalesOrderDetail.UnitPrice) as TotalSales
+from SalesOrderDetail
+ join product on SalesOrderDetail.ProductID = product.ProductID
+ join SalesOrderHeader on SalesOrderDetail.SalesOrderID = SalesOrderHeader.SalesOrderID
+ join Customer on SalesOrderHeader.CustomerID = Customer.CustomerID
+ join CustomerAddress on Customer.CustomerID = CustomerAddress.CustomerID
+ join Address on CustomerAddress.AddressID = Address.AddressID
+group by Address.City
+order by TotalSales desc;
+)a
+
+Result:
+City	TotalSales
+Woolston	90341.14
+London	85245.8
+Union City	68141.99
+Liverpool	65218.2
+Fullerton	60526.52
+Gloucestershire	53248.57
+
+# select top level product category
+select Address.City, ProductCategory.Name as product_Category_Name, sum(SalesOrderDetail.OrderQty * SalesOrderDetail.UnitPrice) as TotalSales
+from Address
+  join SalesOrderHeader on Address.AddressID = SalesOrderHeader.ShipToAddressID
+  join SalesOrderDetail on SalesOrderHeader.SalesOrderID = SalesOrderDetail.SalesOrderID
+  join Product on SalesOrderDetail.ProductID = Product.ProductID
+  join ProductCategory on Product.ProductCategoryID = ProductCategory.ProductCategoryID
+where Address.City in ('Woolston', 'Woolston', 'London')
+group by Address.City, ProductCategory.Name
+order by TotalSales desc, ProductCategory.Name;
+
+Result:
+City	product_Categ..	TotalSales
+Woolston	Touring Bikes	77040.15
+Union City	Road Bikes	53478.76
+London	Mountain Bikes	50881.99
+London	Mountain Frames	24018.8
+Union City	Road Frames	10031.9
+Woolston	Touring Frames	9430.95
+London	Road Bikes	5102.95
+London	Cranksets	1773.81
+Union City	Jerseys	1597.49
+Woolston	Jerseys	1178.02
+Woolston	Vests	1108.19
+London	Shorts	1072.14
+Union City	Vests	904.95
+Union City	Helmets	721.69
+London	Derailleurs	638.85
+Woolston	Helmets	495.36
+Union City	Pedals	490.73
+Woolston	Bike Racks	432
+London	Pedals	390.32
+London	Bottom Brackets	388.73
+Union City	Hydration Packs	296.91
+Woolston	Hydration Packs	296.91
+London	Handlebars	292.63
+London	Saddles	284.43
+Union City	Gloves	264.42
+London	Brakes	255.6
+Woolston	Gloves	161.59
+Union City	Bike Racks	144
+London	Gloves	88.14
+Union City	Handlebars	72.16
+Woolston	Saddles	63.16
+Union City	Caps	57.31
+Woolston	Caps	53.9
+Union City	Cleaners	38.16
+Woolston	Cleaners	38.16
+London	Chains	36.42
+Woolston	Bottles and Cages	31.79
+Union City	Bottles and Cages	29.9
+London	Helmets	20.99
+Woolston	Tires and Tubes	10.96
+Union City	Tires and Tubes	8.22
+Union City	Socks	5.39
+AdventureWorks
+
+
+
+# Resit questions
+1)
+select SalesOrderHeader.SalesOrderID, Customer.CompanyName
+from Customer
+left join SalesOrderHeader on Customer.CustomerID = SalesOrderHeader.CustomerID
+where CompanyName like '%Good Toys%'
+   or CompanyName like '%Bike World%'
+   
+result:  
+SalesOrderID	CompanyName
+              Bike World
+71774	        Good Toys
+
+2)
+select Product.Name, SalesOrderDetail.OrderQty
+from Customer
+join SalesOrderHeader on Customer.CustomerID = SalesOrderHeader.CustomerID
+join SalesOrderDetail on SalesOrderHeader.SalesOrderID = SalesOrderDetail.SalesOrderID
+join Product on SalesOrderDetail.ProductID = Product.ProductID
+where Customer.CompanyName = 'Futuristic Bikes';
+
+Result:
+Name	OrderQty
+ML Mountain Seat/Saddle	2
+Long-Sleeve Logo Jersey, L	2
+Classic Vest, S	3
+
+3)
+select a.CompanyName, Address.AddressLine1, Address.AddressLine2, Address.City, Address.StateProvince, Address.CountyRegion, Address.PostalCode
+from (
+select distinct CustomerID, CompanyName, 1 AS 'Rank'
+from Customer
+where lower(CompanyName) LIKE '%bike%'
+union select distinct CustomerID, CompanyName, 2 AS 'Rank'
+from Customer
+where LOWER(CompanyName) LIKE '%cycle%')a
+join CustomerAddress on a.CustomerID = CustomerAddress.CustomerID
+join Address on CustomerAddress.AddressID = Address.AddressID
+order by a.Rank, a.CompanyName;
+
+
+result:
+CompanyName	AddressLine1	AddressLine2	City	StateProvince	CountyRegion	PostalCode
+A Bike Store	2251 Elliot Avenue	NULL	Seattle	Washington	United States	98104
+A Typical Bike Shop	One Dancing, Rr No. 25	Box 8033	Round Rock	Texas	United States	78664
+Advanced Bike Components	12345 Sterling Avenue	NULL	Irving	Texas	United States	75061
+Area Bike Accessories	6900 Sisk Road	NULL	Modesto	California	United States	95354
+Associated Bikes	5420 West 22500 South	NULL	Salt Lake City	Utah	United States	84101
+Authorized Bike Sales and Rental	490 Ne 4th St	NULL	Renton	Washington	United States	98055
+Basic Bike Company	15 East Main	NULL	Port Orchard	Washington	United States	98366
+Best o' Bikes	250880 Baur Blvd	NULL	Saint Louis	Missouri	United States	63103
+Big-Time Bike Store	9909 W. Ventura Boulevard	NULL	Camarillo	California	United States	93010
+Bike Dealers Association	9952 E. Lohman Ave.	NULL	Las Cruces	New Mexico	United States	88001
+
+4)
+
+select Address.CountyRegion, SUM(SubTotal) as SumRegion
+from SalesOrderHeader
+join Address on SalesOrderHeader.ShipToAddressID = Address.AddressID
+group by Address.CountyRegion
+order by SumRegion desc;
+
+ 
+Result:
+CountyRegion	SumRegion
+United Kingdom	518096.42
+United States	347336.69
+
+5)
+
+select CountyRegion, CustomerID, reTotal
+from(
+select CountyRegion, CustomerAddress.CustomerID, sum(SubTotal)as reTotal,
+RANK() OVER (PARTITION BY Address.CountyRegion order BY sum(SubTotal) desc) as rn
+from Address
+join CustomerAddress on Address.AddressID = CustomerAddress.AddressID
+join SalesOrderHeader on CustomerAddress.CustomerID= SalesOrderHeader.CustomerID
+group by CustomerAddress.CustomerID, Address.CountyRegion
+)a
+where rn = 1
+
+result:
+CountyRegion	CustomerID	reTotal
+United Kingdom	448	108561.83
+United States	24	83858.43
+
