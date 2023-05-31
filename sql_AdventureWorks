@@ -227,20 +227,28 @@ RANGE	Num orders	Total Value
 15)
 
 select * from(
-select ee.City, dd.ProductCateName, sum)
+select ee.City, dd.ProductCateName, sum(Tot) as total, rank() over(partition by ee.city order by sum(tot) desc)as ranknum
+from
+(select SalesOrderID, cc.Name as ProductCateName, sum(OrderQty * UnitPrice)  Tot
+from SalesOrderDetail as aa
+join Product bb on aa.ProductID = bb.ProductID
+join ProductCategoryID = cc.ProductCategoryID
+group by SalesOrderID, cc.Name
+)dd
+join
+(select bb.city, SaleOrderID, SubTotal from SalesOrderHeader as aa
+join Address as bb on aa.ShipToAddressID = bb.AddressID
+join
+(select top 3 City 
+from SalesOrderHeader as aa
+join Address bb on aa.ShipToAddressID = bb.AddressID
+group by City
+order by sum(SubTotal) desc) CC
+on bb.city = CC.city) ee
 
-
-
-
-
-
-
-
-
-
-
-
-
+on dd.SalesOrderID = ee.SalesOrderID
+group by ee.City, dd.ProductCateName)ddd
+where ranknum = 1
 
 
 # select 3  city
