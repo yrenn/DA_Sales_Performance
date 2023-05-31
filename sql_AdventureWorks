@@ -186,19 +186,16 @@ SalesOrderID	ST1	ST2	ST3
 ...
 
 13)
-select Product.Name, sum(SalesOrderDetail.OrderQty * SalesOrderDetail.UnitPrice) as Value
+select * from
+(select Product.Name, sum(SalesOrderDetail.OrderQty * SalesOrderDetail.UnitPrice) as Value, RANK() OVER (PARTITION BY 1 order by sum(SalesOrderDetail.OrderQty * SalesOrderDetail.UnitPrice) desc) as rn
 from Product
  join SalesOrderDetail on Product.ProductID = SalesOrderDetail.ProductID
-group by Product.Name
-order by Value desc;
+group by Product.Name)a
+where rn = 1;
 
 result:
-Name	Value
-Touring-1000 Blue, 60	37191.44
-Mountain-200 Black, 42	37178.73
-Mountain-200 Black, 38	35801.74
-Road-350-W Yellow, 48	33509.58
-Touring-1000 Yellow, 60	23745.32
+Name	Value	rn
+Touring-1000 Blue, 60	37191.44	1
 
 14)
 select a.range as RANGE, count(a.Total) as 'Num orders', sum(a.Total) as 'Total Value'
@@ -228,6 +225,24 @@ RANGE	Num orders	Total Value
 10000-	8	113661.13
 
 15)
+
+select * from(
+select ee.City, dd.ProductCateName, sum)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # select 3  city
 select top 3 * from(
 select Address.City, sum(SalesOrderDetail.OrderQty * SalesOrderDetail.UnitPrice) as TotalSales
@@ -252,7 +267,7 @@ Gloucestershire	53248.57
 
 # select top level product category
 select Address.City, ProductCategory.Name as product_Category_Name, sum(SalesOrderDetail.OrderQty * SalesOrderDetail.UnitPrice) as TotalSales
-from Address
+from ()
   join SalesOrderHeader on Address.AddressID = SalesOrderHeader.ShipToAddressID
   join SalesOrderDetail on SalesOrderHeader.SalesOrderID = SalesOrderDetail.SalesOrderID
   join Product on SalesOrderDetail.ProductID = Product.ProductID
