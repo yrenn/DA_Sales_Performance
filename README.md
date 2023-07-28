@@ -1,7 +1,10 @@
 # sql_retail_company
+The project mainly solves ad hoc problems from the customer and our business department using SQL Query.
+Commonly used statements such as select, join, where, groupby, etc. are used in the SQL code to search on different tables and classifications.
+Apart from that, I achieved some complicated requirements using a subquery and common table expression(CTE). 
+
 
 # lesson learned
-The work shows the basic operation of daily work like searching on different tables, classification, and also achieving some complicated requirements like using a subquery. 
 
 Firstly, ensuring that the results are correct is the most important. And the easiest way to check that is to print all items and find out if there is a null value or duplication data. Secondly, for some complicated requirements, what we should do is split the complicated questions into easier questions than before. 
 
