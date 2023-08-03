@@ -1,4 +1,4 @@
-# sql_retail_company
+# Sales Performace Analysis
 The project mainly solves ad hoc problems from the customer and our business department using SQL Query.
 Commonly used statements such as select, join, where, groupby, etc. are used in the SQL code to search on different tables and classifications.
 Apart from that, I achieved some complicated requirements using a subquery and common table expression(CTE). 
